@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="notice">
+	
+	
+	<!--공지 작성  -->
+	<insert id="write" parameterType="notice">
+		insert into notice(no,id,subject,content,reg_date,orifile,savefile)
+		 values(notice_seq.nextval,#{id},#{subject},#{content},sysdate,#{orifile,jdbcType=VARCHAR},#{savefile,jdbcType=VARCHAR})
+	</insert>
+	
+	<!-- 공지 수 -->
+	<select id="count" resultType="int">
+		select count(*) from notice
+	</select>
+	
+	<!-- 공지 목록 출력 -->
+	<select id="NoticeList" parameterType="int" resultType="notice">
+		<![CDATA[select * from (select a.*, rownum rnum from (select * from notice order by no desc) a) where rnum between #{start} and #{end}]]>
+	</select>
+	
+	<!-- 공지 내용 출력 -->
+	<select id="content" parameterType="int" resultType="notice">
+		select * from notice where no = #{no}
+	</select>
+	
+	<!-- 조회수 증가 -->
+	<update id="countup" parameterType="int">
+		update notice set readcount = (readcount+1) where no = #{no}
+	</update>
+	
+	<!-- 공지 수정 -->
+	<update id="update">
+		update notice set subject=#{subject},content=#{content},reg_date=sysdate,orifile=#{orifile,jdbcType=VARCHAR},savefile=#{savefile,jdbcType=VARCHAR} where no = #{no}
+	</update>
+	
+	<!-- 공지 삭제 -->
+	<delete id="delete">
+		delete from notice where no = #{no}
+	</delete>
+	
+</mapper>

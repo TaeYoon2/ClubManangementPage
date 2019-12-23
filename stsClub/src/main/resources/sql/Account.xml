@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="accounting">
+ <resultMap id="accountMap" type="java.util.HashMap">
+
+		<result javaType="java.lang.Integer" column="no" property="no"/>
+        <result javaType="java.lang.String" column="inout" property="inout"/>
+        <result javaType="java.lang.Integer" column="carrot" property="carrot" />
+        <result javaType="java.sql.Date" column="tran_date" property="tran_date"/>
+        <result javaType="java.lang.String" column="content" property="content"/>
+        <result javaType="java.lang.String" column="orifile" property="orifile"/>
+        <result javaType="java.lang.String" column="savefile" property="savefile"/>
+        
+</resultMap>  
+
+<!-- 	회계연도 추가 -->
+	<insert id="insert" parameterType="int">
+		insert into fiscal values(#{year})
+	</insert>
+	
+	<!-- 회계연도 출력 -->
+	<select id="selectlist" resultType="fiscal">
+		select * from fiscal order by year desc
+	</select>
+	
+<!-- 	회계 장부 내역 추가 -->
+	<insert id="upload" parameterType="account">
+		insert into accounting(no,inout,tran_date,carrot,content,orifile,savefile)
+		values(accounting_seq.nextval, #{inout},#{tran_date},#{carrot},#{content},#{orifile},#{savefile})
+	</insert>
+	
+	<!-- 내역 출력 -->
+	<select id="total" resultType="account">
+		select * from accounting order by tran_date desc
+	</select>
+	
+	<!-- 월별 내역 출력 -->
+	<select id="byMonth" parameterType="HashMap" resultType="account">
+		select * from accounting where tran_date between to_date(concat(#{dat1},'-01'), 'YYYY-MM-dd') and to_date(concat(#{dat1},#{dat2}), 'YYYY-MM-dd') order by tran_date desc 
+	</select>
+	
+	<!-- 연도별 내역 출력 -->
+	<select id="byYear" parameterType="String" resultType="account">
+		select * from accounting where tran_date between to_date(concat(#{dat1},'-01'), 'YYYY-MM') and to_date(concat(#{dat1},'-12-31'), 'YYYY-MM-dd') order by tran_date desc 
+	</select>
+	
+	<select id="basketout" resultType="account">
+  SELECT *
+  FROM accounting
+  WHERE no in
+  <foreach item="item" index="index" collection="list"
+      open="(" separator="," close=")">
+        #{item}
+  </foreach>
+</select>
+<delete id="delete">
+	delete from accounting where no in
+	<foreach item="item" index="index" collection="list"
+      open="(" separator="," close=")">
+        #{item}
+  </foreach>
+</delete>
+</mapper>

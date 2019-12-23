@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="member">
+	<!-- 아이디 중복 검사 -->
+	<select id="checkId" parameterType="String" resultType="int">
+		select count(*) from member where id = #{id}
+	</select>
+	
+	<!--회원가입  -->
+	<insert id="Join" parameterType="member">
+		insert into member(name,id,passwd,birth,email,grade,sex,tel,postcode,address1,address2,reg_date)
+		 values(#{name},#{id},#{passwd},#{birth},#{email},#{grade},#{sex},#{tel},#{postcode},#{address1},#{address2},sysdate)
+	</insert>
+	
+	<!-- 회원수 -->
+	<select id="count" resultType="int">
+		select count(*) from member
+	</select>
+	
+	<!-- 회원 내용 출력 -->
+	<select id="content" parameterType="String" resultType="member">
+		select * from member where id = #{id}
+	</select>
+	
+	<!-- 공지 삭제 -->
+	<delete id="delete">
+		delete from member where id = #{id}
+	</delete>
+	
+	<!-- 회원 목록 출력 -->
+	<select id="MemberList" parameterType="int" resultType="member">
+		<![CDATA[select * from (select a.*, rownum rnum from (select * from member order by reg_date desc) a) where rnum between #{start} and #{end}]]>
+	</select>
+	<!-- 비밀번호 확인 -->
+	<select id="getPass" parameterType="String" resultType="String">
+		select passwd from member where id = #{id}
+	</select>
+	<!-- 등급 확인 -->
+	<select id="grade" parameterType="String" resultType="String">
+		select grade from member where id = #{id}
+	</select>
+	
+<!-- 	회원정보 수정 -->
+	<update id="update" parameterType="member">
+		update member set passwd =nvl(#{passwd,jdbcType=VARCHAR},passwd), tel=nvl(#{tel,jdbcType=VARCHAR},tel), email=nvl(#{email,jdbcType=VARCHAR},email), postcode=nvl(#{postcode,jdbcType=INTEGER},postcode), address1=nvl(#{address1,jdbcType=VARCHAR},address1), address2=nvl(#{address2,jdbcType=VARCHAR},address2) where id = #{id}
+	</update>
+</mapper>
